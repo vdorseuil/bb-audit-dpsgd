@@ -10,8 +10,9 @@ import math
 def compute_eps_lower_gdp(results, alpha, delta):
     """Convert FPR and FNR to eps, delta using GDP at significance level alpha"""
     # Step 1: calculate CP upper bound on FPR and FNR at significance level alpha
-    _, fpr_r = binomtest(int(results.FP), int(results.N)).proportion_ci(confidence_level=1 - 2 * alpha)
-    _, fnr_r = binomtest(int(results.FN), int(results.P)).proportion_ci(confidence_level=1 - 2 * alpha)
+    # Correct with one-sided upper bounds.
+    _, fpr_r = binomtest(int(results.FP), int(results.N), alternative='less').proportion_ci(confidence_level=1 - 2 * alpha)
+    _, fnr_r = binomtest(int(results.FN), int(results.P), alternative='less').proportion_ci(confidence_level=1 - 2 * alpha)
 
     # Step 2: calculate lower bound on mu-GDP
     mu_l = norm.ppf(1 - fpr_r) - norm.ppf(fnr_r)
